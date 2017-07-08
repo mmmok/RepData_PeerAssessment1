@@ -1,17 +1,14 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
-```{r, message=FALSE, warning=FALSE}
+
+```r
 library(dplyr)
 ```
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 df = read.csv('activity.csv')
 tbl = as_tibble(df)
 tbl.filtered = tbl %>% filter(complete.cases(steps))
@@ -19,56 +16,87 @@ tbl.filtered = tbl %>% filter(complete.cases(steps))
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 dailytotal = tbl.filtered %>% group_by(date) %>%
                               summarise(dailytotal = sum(steps))
 ```
 
 ### Histogram
 
-```{r}
+
+```r
 hist(dailytotal$dailytotal, main = 'Total Steps by Day', xlab = 'Steps')
 ```
 
+![](figure/unnamed-chunk-4-1.png)<!-- -->
+
 ### Mean
 
-```{r}
+
+```r
 mean(dailytotal$dailytotal)
+```
+
+```
+## [1] 10766.19
 ```
 
 ### Median
 
-```{r}
+
+```r
 median(dailytotal$dailytotal)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 ### Time series plot
 
-```{r}
+
+```r
 int.mean = tbl.filtered %>% group_by(interval) %>%
                             summarise(mean = mean(steps))
 with(int.mean, plot(interval, mean, type = 'l'))
 ```
 
+![](figure/unnamed-chunk-7-1.png)<!-- -->
+
 ### Maximum number of steps
 
-```{r}
+
+```r
 summarise(int.mean, max = max(mean))
+```
+
+```
+## # A tibble: 1 x 1
+##        max
+##      <dbl>
+## 1 206.1698
 ```
 
 ## Imputing missing values
 
 ### Total number of rows with NAs
 
-```{r}
+
+```r
 sum(! complete.cases(tbl))
+```
+
+```
+## [1] 2304
 ```
 
 ### NAs treatment
 
-```{r}
+
+```r
 tbl.filled = as_tibble(tbl)
 tbl.filled$steps[is.na(tbl$steps)] = 0
 dailytotal = tbl.filled %>% group_by(date) %>%
@@ -77,20 +105,33 @@ dailytotal = tbl.filled %>% group_by(date) %>%
 
 ### Histogram
 
-```{r}
+
+```r
 hist(dailytotal$dailytotal, main = 'Total Steps by Day', xlab = 'Steps')
 ```
 
+![](figure/unnamed-chunk-11-1.png)<!-- -->
+
 ### Mean
 
-```{r}
+
+```r
 mean(dailytotal$dailytotal)
+```
+
+```
+## [1] 9354.23
 ```
 
 ### Median
 
-```{r}
+
+```r
 median(dailytotal$dailytotal)
+```
+
+```
+## [1] 10395
 ```
 
 #### Do these values differ from the estimates from the first part of the assignment?
@@ -103,7 +144,8 @@ Both mean and median decrease.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 as.daytype = function(x) {
     lookup = function(i) {
         if (i %in% c('Saturday', 'Sunday')) {
@@ -122,3 +164,5 @@ int.mean = tbl.daytype %>% group_by(daytype, interval) %>%
 library(lattice)
 xyplot(mean ~ interval | daytype, int.mean, type = 'l')
 ```
+
+![](figure/unnamed-chunk-14-1.png)<!-- -->
